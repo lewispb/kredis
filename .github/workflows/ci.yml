@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        redis_ruby: ["~> 4.6"]
+        redis_ruby: ["~> 2.0", "~> 4.2", ""] # "" = latest
         redis_server: ["4", "5", "6.2"]
         ruby: ["2.7", "3.0"]
 
