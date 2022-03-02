@@ -5,9 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        redis_ruby: ["~> 2.0", "~> 4.2", ""] # "" = latest
+        gemfile: ["redis_2_0", "redis_latest"]
         redis_server: ["4", "5", "6.2"]
         ruby: ["2.7", "3.0"]
+
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile
 
     steps:
       - uses: actions/checkout@v2
@@ -22,9 +25,6 @@ jobs:
         uses: supercharge/redis-github-action@1.2.0
         with:
           redis-version: ${{ matrix.redis_server }}
-
-      - run: gem uninstall redis
-      - run: gem install redis -v '${{ matrix.redis_ruby }}'
 
       - name: Run tests
         run: bin/test
