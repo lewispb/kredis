@@ -1,3 +1,8 @@
-load "Gemfile"
+source "https://rubygems.org"
+
+gemspec
+
+gem "rake"
+gem "byebug"
 
 gem "redis", "~> 2.0"
