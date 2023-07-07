@@ -1,5 +1,6 @@
 class Kredis::Types::Flag < Kredis::Types::Proxying
   proxying :set, :exists?, :del
+  callback_after_change_for :mark, :remove
 
   attr_accessor :expires_in
 

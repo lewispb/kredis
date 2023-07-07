@@ -2,11 +2,10 @@ require "active_support/core_ext/hash"
 
 class Kredis::Types::Hash < Kredis::Types::Proxying
   proxying :hget, :hset, :hmget, :hdel, :hgetall, :hkeys, :hvals, :del, :exists?
-
-  attr_accessor :typed
+  callback_after_change_for :update, :delete, :[]=, :remove
 
   def [](key)
-    string_to_type(hget(key), typed)
+    string_to_type(hget(key))
   end
 
   def []=(key, value)
@@ -14,11 +13,11 @@ class Kredis::Types::Hash < Kredis::Types::Proxying
   end
 
   def update(**entries)
-    hset entries.transform_values{ |val| type_to_string(val, typed) } if entries.flatten.any?
+    hset entries.transform_values{ |val| type_to_string(val) } if entries.flatten.any?
   end
 
   def values_at(*keys)
-    strings_to_types(hmget(keys) || [], typed)
+    strings_to_types(hmget(keys) || [])
   end
 
   def delete(*keys)
@@ -31,7 +30,7 @@ class Kredis::Types::Hash < Kredis::Types::Proxying
   alias clear remove
 
   def entries
-    (hgetall || {}).transform_values { |val| string_to_type(val, typed) }.with_indifferent_access
+    (hgetall || {}).transform_values { |val| string_to_type(val) }.with_indifferent_access
   end
   alias to_h entries
 
@@ -40,6 +39,6 @@ class Kredis::Types::Hash < Kredis::Types::Proxying
   end
 
   def values
-    strings_to_types(hvals || [], typed)
+    strings_to_types(hvals || [])
   end
 end

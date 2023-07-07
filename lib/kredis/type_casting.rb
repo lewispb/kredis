@@ -4,7 +4,15 @@ require "kredis/type/json"
 require "kredis/type/datetime"
 
 module Kredis::TypeCasting
+  extend ActiveSupport::Concern
+
   class InvalidType < StandardError; end
+
+  class_methods do
+    def typed_as(type)
+      self.type_as = type
+    end
+  end
 
   TYPES = {
     string: ActiveModel::Type::String.new,
@@ -16,23 +24,30 @@ module Kredis::TypeCasting
     json: Kredis::Type::Json.new
   }
 
-  def type_to_string(value, type)
-    raise InvalidType if type && !TYPES.key?(type)
-
-    TYPES[type || :string].serialize(value)
+  def typed=(type)
+    self.type_as = type
   end
 
-  def string_to_type(value, type)
-    raise InvalidType if type && !TYPES.key?(type)
-
-    TYPES[type || :string].cast(value)
+  def type_to_string(value)
+    type.serialize(value)
   end
 
-  def types_to_strings(values, type)
-    Array(values).flatten.map { |value| type_to_string(value, type) }
+  def string_to_type(value)
+    type.cast(value)
   end
 
-  def strings_to_types(values, type)
-    Array(values).flatten.map { |value| string_to_type(value, type) }
+  def types_to_strings(values)
+    Array(values).flatten.map { |value| type_to_string(value) }
   end
+
+  def strings_to_types(values)
+    Array(values).flatten.map { |value| string_to_type(value) }
+  end
+
+  private
+    def type
+      raise InvalidType if type_as && !TYPES.key?(type_as)
+
+      TYPES[type_as || :string]
+    end
 end

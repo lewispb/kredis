@@ -1,16 +1,15 @@
 class Kredis::Types::OrderedSet < Kredis::Types::Proxying
   proxying :multi, :zrange, :zrem, :zadd, :zremrangebyrank, :zcard, :exists?, :del
 
-  attr_accessor :typed
   attr_reader :limit
 
   def elements
-    strings_to_types(zrange(0, -1) || [], typed)
+    strings_to_types(zrange(0, -1) || [])
   end
   alias to_a elements
 
   def remove(*elements)
-    zrem(types_to_strings(elements, typed))
+    zrem(types_to_strings(elements))
   end
 
   def prepend(elements)
@@ -33,7 +32,7 @@ class Kredis::Types::OrderedSet < Kredis::Types::Proxying
       elements = Array(elements)
       return if elements.empty?
 
-      elements_with_scores = types_to_strings(elements, typed).map.with_index do |element, index|
+      elements_with_scores = types_to_strings(elements).map.with_index do |element, index|
         incremental_score = index * 0.000001
 
         score = if prepending

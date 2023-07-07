@@ -6,6 +6,16 @@ class Kredis::Types::Proxy
 
   thread_mattr_accessor :pipeline
 
+  class << self
+    def proxy_from(key, config:, after_change:)
+      new(configured_for(config), namespaced_key(key)).then do |type|
+        after_change ? Kredis::CallbacksProxy.new(type, after_change) : type
+      end
+    end
+
+    delegate :configured_for, :namespaced_key, to: Kredis
+  end
+
   def initialize(redis, key, **options)
     @redis, @key = redis, key
     options.each { |key, value| send("#{key}=", value) }

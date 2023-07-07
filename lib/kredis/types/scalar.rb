@@ -1,14 +1,15 @@
 class Kredis::Types::Scalar < Kredis::Types::Proxying
   proxying :set, :get, :exists?, :del, :expire, :expireat
+  callback_after_change_for :value=, :clear
 
-  attr_accessor :typed, :default, :expires_in
+  attr_accessor :default, :expires_in
 
   def value=(value)
-    set type_to_string(value, typed), ex: expires_in
+    set type_to_string(value), ex: expires_in
   end
 
   def value
-    value_after_casting = string_to_type(get, typed)
+    value_after_casting = string_to_type(get)
 
     if value_after_casting.nil?
       default

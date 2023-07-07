@@ -1,20 +1,19 @@
 class Kredis::Types::Set < Kredis::Types::Proxying
   proxying :smembers, :sadd, :srem, :multi, :del, :sismember, :scard, :spop, :exists?, :srandmember
-
-  attr_accessor :typed
+  callback_after_change_for :add, :<<, :remove, :replace, :take, :clear
 
   def members
-    strings_to_types(smembers || [], typed).sort
+    strings_to_types(smembers || []).sort
   end
   alias to_a members
 
   def add(*members)
-    sadd types_to_strings(members, typed) if members.flatten.any?
+    sadd types_to_strings(members) if members.flatten.any?
   end
   alias << add
 
   def remove(*members)
-    srem types_to_strings(members, typed) if members.flatten.any?
+    srem types_to_strings(members) if members.flatten.any?
   end
 
   def replace(*members)
@@ -25,7 +24,7 @@ class Kredis::Types::Set < Kredis::Types::Proxying
   end
 
   def include?(member)
-    sismember type_to_string(member, typed)
+    sismember type_to_string(member)
   end
 
   def size
@@ -33,7 +32,7 @@ class Kredis::Types::Set < Kredis::Types::Proxying
   end
 
   def take
-    string_to_type(spop, typed)
+    string_to_type(spop)
   end
 
   def clear
@@ -42,9 +41,9 @@ class Kredis::Types::Set < Kredis::Types::Proxying
 
   def sample(count = nil)
     if count.nil?
-      string_to_type(srandmember(count), typed)
+      string_to_type(srandmember(count))
     else
-      strings_to_types(srandmember(count), typed)
+      strings_to_types(srandmember(count))
     end
   end
 end

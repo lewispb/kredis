@@ -2,6 +2,7 @@ class Kredis::Types::Slots < Kredis::Types::Proxying
   class NotAvailable < StandardError; end
 
   proxying :incr, :decr, :get, :del, :exists?
+  callback_after_change_for :reserve, :release, :reset
 
   attr_accessor :available
 

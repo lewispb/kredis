@@ -1,10 +1,30 @@
+require "kredis/type_casting"
+require "active_support/core_ext/class/attribute"
 require "active_support/core_ext/module/delegation"
 
 class Kredis::Types::Proxying
+  include Kredis::TypeCasting
+  class_attribute :type_as
+  class_attribute :after_change_operations, default: []
+
   attr_accessor :proxy, :key
 
-  def self.proxying(*commands)
-    delegate(*commands, to: :proxy)
+  class << self
+    def proxying(*commands)
+      delegate(*commands, to: :proxy)
+    end
+
+    def callback_after_change_for(*methods)
+      self.after_change_operations = methods
+    end
+
+    def type_from(key, config: :shared, after_change: nil, **options)
+      new(configured_for(config), namespaced_key(key), **options).then do |type|
+        after_change ? Kredis::CallbacksProxy.new(type, after_change) : type
+      end
+    end
+
+    delegate :configured_for, :namespaced_key, to: Kredis
   end
 
   def initialize(redis, key, **options)
@@ -23,7 +43,4 @@ class Kredis::Types::Proxying
     # call Redis commands that don't reference a key and don't want to be pipelined.
     @redis
   end
-
-  private
-    delegate :type_to_string, :string_to_type, :types_to_strings, :strings_to_types, to: :Kredis
 end

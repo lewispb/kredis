@@ -1,8 +1,9 @@
 # You'd normally call this a set, but Redis already has another data type for that
 class Kredis::Types::UniqueList < Kredis::Types::List
   proxying :multi, :ltrim, :exists?
+  callback_after_change_for :remove, :prepend, :append, :<<
 
-  attr_accessor :typed, :limit
+  attr_accessor :limit
 
   def prepend(elements)
     elements = Array(elements).uniq

@@ -2,6 +2,7 @@ require "active_support/core_ext/object/inclusion"
 
 class Kredis::Types::Enum < Kredis::Types::Proxying
   proxying :set, :get, :del, :exists?
+  callback_after_change_for :value=, :reset
 
   attr_accessor :values, :default
 
