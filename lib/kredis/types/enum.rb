@@ -4,7 +4,7 @@ class Kredis::Types::Enum < Kredis::Types::Proxying
   proxying :set, :get, :del, :exists?
   callback_after_change_for :value=, :reset
 
-  attr_accessor :values, :default
+  attr_accessor :values
 
   def initialize(config, key, values:, default:)
     super
@@ -31,5 +31,9 @@ class Kredis::Types::Enum < Kredis::Types::Proxying
         define_singleton_method("#{defined_value}?") { value == defined_value }
         define_singleton_method("#{defined_value}!") { self.value = defined_value }
       end
+    end
+
+    def set_default
+      # default is not persisted
     end
 end

@@ -6,7 +6,7 @@ class Kredis::Types::Slots < Kredis::Types::Proxying
 
   attr_accessor :available
 
-  def initialize(config, key, available:)
+  def initialize(config, key, available:, default: nil)
     super
   end
 

@@ -7,9 +7,9 @@ class Kredis::Types::UniqueList < Kredis::Types::List
 
   typed_as :string
 
-  def initialize(config, key, typed: nil, limit: nil)
+  def initialize(config, key, limit: nil, typed: nil, default: nil)
     @limit = limit
-    super(config, key, typed: typed)
+    super(config, key, typed: typed, default: default)
   end
 
   def prepend(elements)

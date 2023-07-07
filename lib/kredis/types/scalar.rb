@@ -4,7 +4,7 @@ class Kredis::Types::Scalar < Kredis::Types::Proxying
   proxying :set, :get, :exists?, :del, :expire, :expireat
   callback_after_change_for :value=, :clear
 
-  attr_accessor :default, :expires_in
+  attr_accessor :expires_in
 
   def initialize(config, key, typed: nil, default: nil, expires_in: nil)
     super
@@ -43,4 +43,9 @@ class Kredis::Types::Scalar < Kredis::Types::Proxying
   def expire_at(datetime)
     expireat datetime.to_i
   end
+
+  private
+    def set_default
+      self.value = default
+    end
 end

@@ -5,7 +5,7 @@ class Kredis::Types::OrderedSet < Kredis::Types::Proxying
 
   typed_as :string
 
-  def initialize(config, key, typed: nil, limit: nil)
+  def initialize(config, key, typed: nil, limit: nil, default: nil)
     self.limit = limit
     super(config, key, typed: typed)
   end

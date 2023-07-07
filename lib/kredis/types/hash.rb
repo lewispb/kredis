@@ -6,7 +6,7 @@ class Kredis::Types::Hash < Kredis::Types::Proxying
 
   typed_as :string
 
-  def initialize(config, key, typed: nil)
+  def initialize(config, key, typed: nil, default: nil)
     super
   end
 

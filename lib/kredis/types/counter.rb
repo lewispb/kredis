@@ -4,20 +4,20 @@ class Kredis::Types::Counter < Kredis::Types::Proxying
 
   attr_accessor :expires_in
 
-  def initialize(config, key, expires_in: nil)
+  def initialize(config, key, expires_in: nil, default: 0)
     super
   end
 
   def increment(by: 1)
     multi do
-      set 0, ex: expires_in, nx: true
+      set_default
       incrby by
     end[-1]
   end
 
   def decrement(by: 1)
     multi do
-      set 0, ex: expires_in, nx: true
+      set_default
       decrby by
     end[-1]
   end
@@ -29,4 +29,9 @@ class Kredis::Types::Counter < Kredis::Types::Proxying
   def reset
     del
   end
+
+  private
+    def set_default
+      set default, ex: expires_in, nx: true
+    end
 end

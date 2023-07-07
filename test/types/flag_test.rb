@@ -38,4 +38,9 @@ class FlagTest < ActiveSupport::TestCase
     sleep 0.6.seconds
     assert_not @flag.marked?
   end
+
+  test "default value" do
+    flag = Kredis.flag "myflag", default: true
+    assert flag.marked?
+  end
 end

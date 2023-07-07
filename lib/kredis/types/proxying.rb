@@ -1,9 +1,12 @@
-require "kredis/type_casting"
 require "active_support/core_ext/class/attribute"
 require "active_support/core_ext/module/delegation"
+require "kredis/type_casting"
+require "kredis/default_values"
 
 class Kredis::Types::Proxying
   include Kredis::TypeCasting
+  prepend Kredis::DefaultValues
+
   class_attribute :type_as
   class_attribute :after_change_operations, default: []
 

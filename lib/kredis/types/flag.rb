@@ -4,7 +4,7 @@ class Kredis::Types::Flag < Kredis::Types::Proxying
 
   attr_accessor :expires_in
 
-  def initialize(config, key, expires_in: nil)
+  def initialize(config, key, expires_in: nil, default: nil)
     super
   end
 
@@ -19,4 +19,9 @@ class Kredis::Types::Flag < Kredis::Types::Proxying
   def remove
     del
   end
+
+  private
+    def set_default
+      set 1 if default
+    end
 end

@@ -1,15 +1,17 @@
 class Kredis::Types::List < Kredis::Types::Proxying
+  prepend Kredis::DefaultValues
+
   proxying :lrange, :lrem, :lpush, :ltrim, :rpush, :exists?, :del
   callback_after_change_for :remove, :prepend, :append, :<<
 
   typed_as :string
 
-  def initialize(config, key, typed: nil)
+  def initialize(config, key, typed: nil, default: nil)
     super
   end
 
   def elements
-    strings_to_types(lrange(0, -1) || [])
+    strings_to_types(lrange(0, -1))
   end
   alias to_a elements
 
@@ -33,4 +35,9 @@ class Kredis::Types::List < Kredis::Types::Proxying
   def last(n = nil)
     n ? lrange(-n, -1) : lrange(-1, -1).first
   end
+
+  protected
+    def set_default
+      append default
+    end
 end

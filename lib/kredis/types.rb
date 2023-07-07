@@ -3,7 +3,7 @@ module Kredis::Types
 
   TYPES = %w[ scalar string integer decimal float boolean datetime json counter cycle enum flag hash list ordered_set set slots string unique_list ]
 
-  def proxy(key, config: :shared, after_change: nil)
+  def proxy(key, config: :shared, after_change: nil, default: nil)
     Proxy.proxy_from(key, config: config, after_change: after_change)
   end
 

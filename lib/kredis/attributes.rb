@@ -6,24 +6,24 @@ module Kredis::Attributes
       kredis_connection_with __method__, name, key, config: config, after_change: after_change
     end
 
-    def kredis_string(name, key: nil, config: :shared, after_change: nil, expires_in: nil)
-      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in
+    def kredis_string(name, key: nil, config: :shared, after_change: nil, expires_in: nil, default: nil)
+      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in, default: default
     end
 
-    def kredis_integer(name, key: nil, config: :shared, after_change: nil, expires_in: nil)
-      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in
+    def kredis_integer(name, key: nil, config: :shared, after_change: nil, expires_in: nil, default: nil)
+      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in, default: default
     end
 
-    def kredis_decimal(name, key: nil, config: :shared, after_change: nil, expires_in: nil)
-      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in
+    def kredis_decimal(name, key: nil, config: :shared, after_change: nil, expires_in: nil, default: nil)
+      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in, default: default
     end
 
-    def kredis_datetime(name, key: nil, config: :shared, after_change: nil, expires_in: nil)
-      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in
+    def kredis_datetime(name, key: nil, config: :shared, after_change: nil, expires_in: nil, default: nil)
+      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in, default: default
     end
 
-    def kredis_flag(name, key: nil, config: :shared, after_change: nil, expires_in: nil)
-      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in
+    def kredis_flag(name, key: nil, config: :shared, after_change: nil, expires_in: nil, default: nil)
+      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in, default: default
 
       define_method("#{name}?") do
         send(name).marked?
@@ -42,12 +42,12 @@ module Kredis::Attributes
       kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in
     end
 
-    def kredis_list(name, key: nil, typed: :string, config: :shared, after_change: nil)
-      kredis_connection_with __method__, name, key, typed: typed, config: config, after_change: after_change
+    def kredis_list(name, key: nil, typed: :string, config: :shared, after_change: nil, default: nil)
+      kredis_connection_with __method__, name, key, typed: typed, config: config, after_change: after_change, default: default
     end
 
-    def kredis_unique_list(name, limit: nil, key: nil, typed: :string, config: :shared, after_change: nil)
-      kredis_connection_with __method__, name, key, limit: limit, typed: typed, config: config, after_change: after_change
+    def kredis_unique_list(name, limit: nil, key: nil, typed: :string, config: :shared, after_change: nil, default: nil)
+      kredis_connection_with __method__, name, key, limit: limit, typed: typed, config: config, after_change: after_change, default: default
     end
 
     def kredis_ordered_set(name, limit: nil, key: nil, typed: :string, config: :shared, after_change: nil)
@@ -66,8 +66,8 @@ module Kredis::Attributes
       kredis_connection_with __method__, name, key, available: available, config: config, after_change: after_change
     end
 
-    def kredis_counter(name, key: nil, config: :shared, after_change: nil, expires_in: nil)
-      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in
+    def kredis_counter(name, key: nil, config: :shared, after_change: nil, expires_in: nil, default: 0)
+      kredis_connection_with __method__, name, key, config: config, after_change: after_change, expires_in: expires_in, default: default
     end
 
     def kredis_hash(name, key: nil, typed: :string, config: :shared, after_change: nil)
@@ -79,7 +79,7 @@ module Kredis::Attributes
     end
 
     private
-      def kredis_connection_with(method, name, key, **options)
+      def kredis_connection_with(method, name, key, default: nil, **options)
         ivar_symbol = :"@#{name}_#{method}"
         type = method.to_s.sub("kredis_", "")
         after_change = options.delete(:after_change)
@@ -88,7 +88,7 @@ module Kredis::Attributes
           if instance_variable_defined?(ivar_symbol)
             instance_variable_get(ivar_symbol)
           else
-            new_type = Kredis.send(type, kredis_key_evaluated(key) || kredis_key_for_attribute(name), **options)
+            new_type = Kredis.send(type, kredis_key_evaluated(key) || kredis_key_for_attribute(name), default: kredis_default_evaluated(default), **options)
             instance_variable_set ivar_symbol,
               after_change ? enrich_after_change_with_record_access(new_type, after_change) : new_type
           end
@@ -117,6 +117,14 @@ module Kredis::Attributes
       case original_after_change
       when Proc   then Kredis::Types::CallbacksProxy.new(type, ->(_) { original_after_change.call(self) })
       when Symbol then Kredis::Types::CallbacksProxy.new(type, ->(_) { send(original_after_change) })
+      end
+    end
+
+    def kredis_default_evaluated(default)
+      case default
+      when Proc   then Proc.new { default.call(self) }
+      when Symbol then send(default)
+      else default
       end
     end
 end

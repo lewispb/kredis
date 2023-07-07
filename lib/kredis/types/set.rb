@@ -2,7 +2,7 @@ class Kredis::Types::Set < Kredis::Types::Proxying
   proxying :smembers, :sadd, :srem, :multi, :del, :sismember, :scard, :spop, :exists?, :srandmember
   callback_after_change_for :add, :<<, :remove, :replace, :take, :clear
 
-  def initialize(config, key, typed: nil)
+  def initialize(config, key, typed: nil, default: nil)
     super
   end
 

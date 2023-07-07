@@ -1,5 +1,4 @@
 require "test_helper"
-require "active_support/core_ext/integer"
 
 class HashTest < ActiveSupport::TestCase
   setup { @hash = Kredis.hash "myhash" }

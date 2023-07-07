@@ -1,5 +1,4 @@
 require "test_helper"
-require "active_support/core_ext/integer"
 
 class Person
   include Kredis::Attributes
@@ -10,12 +9,16 @@ class Person
   kredis_list :names
   kredis_list :names_with_custom_key_via_lambda, key: ->(p) { "person:#{p.id}:names_customized" }
   kredis_list :names_with_custom_key_via_method, key: :generate_key
+  kredis_list :names_with_default, default: ->(p) { ["Random", p.name] }
   kredis_unique_list :skills, limit: 2
   kredis_ordered_set :reading_list, limit: 2
   kredis_flag :special
   kredis_flag :temporary_special, expires_in: 1.second
+  kredis_unique_list :skills_with_default, default: ->(p) { ["Random", "Random", p.name] }
   kredis_string :address
+  kredis_string :address_with_default, default: "123 Main St"
   kredis_integer :age
+  kredis_integer :age_with_default, default: :age_method
   kredis_decimal :salary
   kredis_datetime :last_seen_at
   kredis_float :height
@@ -36,6 +39,14 @@ class Person
 
   def id
     8
+  end
+
+  def name
+    "Jason"
+  end
+
+  def age_method
+    21
   end
 
   private
@@ -84,11 +95,21 @@ class AttributesTest < ActiveSupport::TestCase
     assert_equal %w[ david kasper ], Kredis.redis.lrange("some-generated-key", 0, -1)
   end
 
+  test "list with default proc value" do
+    assert_equal %w[ Random Jason ], @person.names_with_default.elements
+    assert_equal %w[ Random Jason ], Kredis.redis.lrange("people:8:names_with_default", 0, -1)
+  end
+
   test "unique list" do
     @person.skills.prepend(%w[ trolling photography ])
     @person.skills.prepend("racing")
     @person.skills.prepend("racing")
     assert_equal %w[ racing photography ], @person.skills.elements
+  end
+
+  test "unique list with default proc value" do
+    assert_equal %w[ Random Jason ], @person.skills_with_default.elements
+    assert_equal %w[ Random Jason ], Kredis.redis.lrange("people:8:skills_with_default", 0, -1)
   end
 
   test "ordered set" do
@@ -117,10 +138,21 @@ class AttributesTest < ActiveSupport::TestCase
     assert_not @person.address.assigned?
   end
 
+  test "string with default proc value" do
+    assert_equal "123 Main St", @person.address_with_default.to_s
+
+    @person.address.clear
+    assert_not @person.address.assigned?
+  end
+
   test "integer" do
     @person.age.value = 41
     assert_equal 41, @person.age.value
     assert_equal "41", @person.age.to_s
+  end
+
+  test "integer with default method value" do
+    assert_equal 21, @person.age_with_default.value
   end
 
   test "decimal" do

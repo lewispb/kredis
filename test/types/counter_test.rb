@@ -1,5 +1,4 @@
 require "test_helper"
-require "active_support/core_ext/integer"
 
 class CounterTest < ActiveSupport::TestCase
   setup { @counter = Kredis.counter "mycounter" }
@@ -77,5 +76,13 @@ class CounterTest < ActiveSupport::TestCase
 
     @counter.increment
     assert @counter.exists?
+  end
+
+  test "default value" do
+    @counter = Kredis.counter "mycounter", default: 5
+
+    @counter.increment
+
+    assert_equal 6, @counter.value
   end
 end

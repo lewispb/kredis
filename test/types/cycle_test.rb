@@ -1,5 +1,4 @@
 require "test_helper"
-require "active_support/core_ext/integer"
 
 class CycleTest < ActiveSupport::TestCase
   setup { @cycle = Kredis.cycle "mycycle", values: %i[ one two three ] }

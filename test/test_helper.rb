@@ -1,6 +1,7 @@
 require "bundler/setup"
 require "active_support/test_case"
 require "active_support/testing/autorun"
+require "active_support/core_ext/integer"
 require "minitest/mock"
 require "byebug"
 
