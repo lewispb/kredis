@@ -6,7 +6,7 @@ class Kredis::Types::Enum < Kredis::Types::Proxying
 
   attr_accessor :values, :default
 
-  def initialize(...)
+  def initialize(config, key, values:, default:)
     super
     define_predicates_for_values
   end

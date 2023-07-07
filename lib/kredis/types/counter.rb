@@ -4,6 +4,10 @@ class Kredis::Types::Counter < Kredis::Types::Proxying
 
   attr_accessor :expires_in
 
+  def initialize(config, key, expires_in: nil)
+    super
+  end
+
   def increment(by: 1)
     multi do
       set 0, ex: expires_in, nx: true

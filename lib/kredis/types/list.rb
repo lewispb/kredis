@@ -2,6 +2,12 @@ class Kredis::Types::List < Kredis::Types::Proxying
   proxying :lrange, :lrem, :lpush, :ltrim, :rpush, :exists?, :del
   callback_after_change_for :remove, :prepend, :append, :<<
 
+  typed_as :string
+
+  def initialize(config, key, typed: nil)
+    super
+  end
+
   def elements
     strings_to_types(lrange(0, -1) || [])
   end

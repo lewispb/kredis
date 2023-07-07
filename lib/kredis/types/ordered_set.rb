@@ -3,6 +3,13 @@ class Kredis::Types::OrderedSet < Kredis::Types::Proxying
 
   attr_reader :limit
 
+  typed_as :string
+
+  def initialize(config, key, typed: nil, limit: nil)
+    self.limit = limit
+    super(config, key, typed: typed)
+  end
+
   def elements
     strings_to_types(zrange(0, -1) || [])
   end

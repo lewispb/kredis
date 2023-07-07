@@ -25,7 +25,7 @@ module Kredis::TypeCasting
   }
 
   def typed=(type)
-    self.type_as = type
+    self.type_as = type if type
   end
 
   def type_to_string(value)

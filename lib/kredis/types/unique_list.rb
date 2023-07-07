@@ -5,6 +5,13 @@ class Kredis::Types::UniqueList < Kredis::Types::List
 
   attr_accessor :limit
 
+  typed_as :string
+
+  def initialize(config, key, typed: nil, limit: nil)
+    @limit = limit
+    super(config, key, typed: typed)
+  end
+
   def prepend(elements)
     elements = Array(elements).uniq
     return if elements.empty?

@@ -3,6 +3,11 @@ class Kredis::Types::Cycle < Kredis::Types::Counter
 
   attr_accessor :values
 
+  def initialize(config, key, values:, expires_in: nil)
+    @values = values
+    super(config, key, expires_in: expires_in)
+  end
+
   alias index value
 
   def value

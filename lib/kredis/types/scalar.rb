@@ -1,8 +1,14 @@
 class Kredis::Types::Scalar < Kredis::Types::Proxying
+  typed_as :string
+
   proxying :set, :get, :exists?, :del, :expire, :expireat
   callback_after_change_for :value=, :clear
 
   attr_accessor :default, :expires_in
+
+  def initialize(config, key, typed: nil, default: nil, expires_in: nil)
+    super
+  end
 
   def value=(value)
     set type_to_string(value), ex: expires_in

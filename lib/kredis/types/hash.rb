@@ -4,6 +4,12 @@ class Kredis::Types::Hash < Kredis::Types::Proxying
   proxying :hget, :hset, :hmget, :hdel, :hgetall, :hkeys, :hvals, :del, :exists?
   callback_after_change_for :update, :delete, :[]=, :remove
 
+  typed_as :string
+
+  def initialize(config, key, typed: nil)
+    super
+  end
+
   def [](key)
     string_to_type(hget(key))
   end
